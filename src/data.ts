@@ -1,3 +1,5 @@
+import { v4 } from "uuid";
+
 export enum ReportType {
   INCOME = 'income',
   EXPENSE = 'expense'
@@ -19,7 +21,7 @@ export interface Data {
 export const data: Data = {
   report: [
     {
-      id: 'uuid1',
+      id: v4(),
       source: 'youtube',
       amount: 7500,
       created_at: new Date(),
