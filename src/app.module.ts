@@ -3,9 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ReportModule } from './report/report.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import ormconfig from './ormconfig'
 
 @Module({
-  imports: [ReportModule],
+  imports: [
+    TypeOrmModule.forRoot(ormconfig),
+    ReportModule
+  ],
   controllers: [AppController],
   providers: [
     AppService,
