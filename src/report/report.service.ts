@@ -3,13 +3,23 @@ import { data, ReportType } from 'src/data';
 import { v4 as uuid } from "uuid";
 import type { Report } from 'src/data'
 import { ReportDataDto, ReportResponseDto } from 'src/dtos/report.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ReportEntity } from './report.entity';
 
 @Injectable()
 export class ReportService {
-  getAllReports(type: ReportType): ReportResponseDto[] {
-    return data.report.filter(
-      (report) => report.type === type
-    ).map((report) => new ReportResponseDto(report))
+  constructor(
+    @InjectRepository(ReportEntity)
+    private readonly reportsRepository: Repository<ReportEntity>
+  ) { }
+
+  async getAllReports(type: ReportType): Promise<ReportResponseDto[]> {
+    let reports = await this.reportsRepository.find({ where: { type: type } })
+    return reports.map(
+      (report) =>
+        new ReportResponseDto(report)
+    )
   }
 
   getReportById(
