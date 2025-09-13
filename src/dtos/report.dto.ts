@@ -1,13 +1,13 @@
 import { Exclude, Expose } from "class-transformer";
 import { IsNotEmpty, IsNumber, IsPositive, IsString } from "class-validator";
-import { ReportType } from "src/data";
+import { ReportType } from "src/report/report.entity";
 
 export class ReportDataDto {
   @IsString()
-  @IsPositive()
   source: string;
 
   @IsNumber()
+  @IsPositive()
   @IsNotEmpty()
   amount: number
 };

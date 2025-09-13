@@ -1,11 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { data, ReportType } from 'src/data';
-import { v4 as uuid } from "uuid";
-import type { Report } from 'src/data'
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ReportDataDto, ReportResponseDto } from 'src/dtos/report.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ReportEntity } from './report.entity';
+import { ReportEntity, ReportType } from './report.entity';
+
+type ResponseJson = { "message": string }
 
 @Injectable()
 export class ReportService {
@@ -22,73 +21,94 @@ export class ReportService {
     )
   }
 
-  getReportById(
+  async getReportById(
     type: ReportType,
     id: string
-  ) {
+  ): Promise<ReportResponseDto> {
     const report =
-      data.report.find(
-        (report) =>
-          report.type === type && report.id === id
-      )
+      await this.reportsRepository.findOne({
+        where: {
+          id: id,
+          type: type,
+        }
+      })
+
     if (!report)
       throw new NotFoundException(`Report with id ${id} not found`);
 
     return new ReportResponseDto(report)
   }
 
-  createReport(
+  async createReport(
     type: ReportType,
     reportData: ReportDataDto
-  ): ReportResponseDto {
-    const newReport: Report = {
-      id: uuid(),
-      ...reportData,
-      created_at: new Date(),
-      updated_at: new Date(),
-      type: type
-    }
+  ): Promise<ResponseJson> {
+    try {
+      await this.reportsRepository
+        .createQueryBuilder()
+        .insert()
+        .into('reports')
+        .values({
+          ...reportData,
+          type: type
+        })
+        .execute()
 
-    data.report.push(newReport)
-    return new ReportResponseDto(newReport)
+      return { message: "Report created successfully" }
+    } catch (err) {
+      console.error('Insert failed:', err);
+      throw new InternalServerErrorException('Could not insert report');
+    }
   }
 
-  editReport(
+  async editReport(
     type: ReportType,
     id: string,
     reportData: ReportDataDto
-  ): ReportResponseDto {
-    let report =
-      data.report.find(
-        (report) =>
-          report.type === type && report.id === id
-      )
+  ): Promise<ResponseJson> {
+    try {
+      const result =
+        await this.reportsRepository
+          .createQueryBuilder()
+          .update(ReportEntity)
+          .set({ ...reportData })
+          .where('id = :id AND type = :type', { id: id, type: type })
+          .execute()
 
-    if (!report)
-      throw new NotFoundException(`Report with id ${id} not found`);
+      if (result.affected == 0)
+        throw new NotFoundException(`Report with id ${id} not found`);
 
-    report.source = reportData.source
-    report.amount = reportData.amount
-    report.updated_at = new Date()
+      return { message: "Report deleted successfully" }
+    } catch (err) {
+      if (err instanceof NotFoundException) throw err
 
-    return new ReportResponseDto(report)
+      console.error('Delete failed:', err);
+      throw new InternalServerErrorException('Could not delete report');
+    }
   }
 
-  removeReport(
+  async removeReport(
     type: ReportType,
     id: string
-  ): ReportResponseDto {
-    const reportToDelete =
-      data.report.findIndex(
-        (report) =>
-          report.type === type && report.id === id
-      )
+  ): Promise<ResponseJson> {
+    try {
+      const result =
+        await this.reportsRepository
+          .createQueryBuilder()
+          .delete()
+          .from(ReportEntity)
+          .where('id = :id AND type = :type', { id: id, type: type })
+          .execute()
 
-    if (reportToDelete === -1)
-      throw new NotFoundException(`Report with id ${id} not found`);
+      if (result.affected == 0)
+        throw new NotFoundException(`Report with id ${id} not found`);
 
-    const [reportDeleted] = data.report.splice(reportToDelete, 1)
+      return { message: "Report deleted successfully" }
+    } catch (err) {
+      if (err instanceof NotFoundException) throw err
 
-    return new ReportResponseDto(reportDeleted)
+      console.error('Delete failed:', err);
+      throw new InternalServerErrorException('Could not delete report');
+    }
   }
 }
