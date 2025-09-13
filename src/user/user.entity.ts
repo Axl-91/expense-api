@@ -1,34 +1,40 @@
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Entity({ name: 'users' })
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id: string;
 
   @Column()
-  username: string
+  username: string;
 
   @Column({ unique: true })
-  email: string
+  email: string;
 
   @Column()
-  password: string
+  password: string;
 
   @CreateDateColumn()
-  created_at: Date
+  created_at: Date;
 
   @UpdateDateColumn()
-  updated_at: Date
+  updated_at: Date;
 
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword() {
     if (this.password) {
-      const salt = await bcrypt.genSalt(10)
-      this.password = await bcrypt.hash(this.password, salt)
+      const salt = await bcrypt.genSalt(10);
+      this.password = await bcrypt.hash(this.password, salt);
     }
-
   }
 }
-

@@ -1,47 +1,48 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ReportEntity, ReportType } from './report.entity';
 import { ReportDataDto, ReportResponseDto } from './dto/report.dto';
 
-type ResponseJson = { "message": string }
+type ResponseJson = { message: string };
 
 @Injectable()
 export class ReportService {
   constructor(
     @InjectRepository(ReportEntity)
-    private readonly reportsRepository: Repository<ReportEntity>
-  ) { }
+    private readonly reportsRepository: Repository<ReportEntity>,
+  ) {}
 
   async getAllReports(type: ReportType): Promise<ReportResponseDto[]> {
-    let reports = await this.reportsRepository.find({ where: { type: type } })
-    return reports.map(
-      (report) =>
-        new ReportResponseDto(report)
-    )
+    const reports = await this.reportsRepository.find({
+      where: { type: type },
+    });
+    return reports.map((report) => new ReportResponseDto(report));
   }
 
   async getReportById(
     type: ReportType,
-    id: string
+    id: string,
   ): Promise<ReportResponseDto> {
-    const report =
-      await this.reportsRepository.findOne({
-        where: {
-          id: id,
-          type: type,
-        }
-      })
+    const report = await this.reportsRepository.findOne({
+      where: {
+        id: id,
+        type: type,
+      },
+    });
 
-    if (!report)
-      throw new NotFoundException(`Report with id ${id} not found`);
+    if (!report) throw new NotFoundException(`Report with id ${id} not found`);
 
-    return new ReportResponseDto(report)
+    return new ReportResponseDto(report);
   }
 
   async createReport(
     type: ReportType,
-    reportData: ReportDataDto
+    reportData: ReportDataDto,
   ): Promise<ResponseJson> {
     try {
       await this.reportsRepository
@@ -50,11 +51,11 @@ export class ReportService {
         .into('reports')
         .values({
           ...reportData,
-          type: type
+          type: type,
         })
-        .execute()
+        .execute();
 
-      return { message: "Report created successfully" }
+      return { message: 'Report created successfully' };
     } catch (err) {
       console.error('Insert failed:', err);
       throw new InternalServerErrorException('Could not insert report');
@@ -64,48 +65,43 @@ export class ReportService {
   async editReport(
     type: ReportType,
     id: string,
-    reportData: ReportDataDto
+    reportData: ReportDataDto,
   ): Promise<ResponseJson> {
     try {
-      const result =
-        await this.reportsRepository
-          .createQueryBuilder()
-          .update(ReportEntity)
-          .set({ ...reportData })
-          .where('id = :id AND type = :type', { id: id, type: type })
-          .execute()
+      const result = await this.reportsRepository
+        .createQueryBuilder()
+        .update(ReportEntity)
+        .set({ ...reportData })
+        .where('id = :id AND type = :type', { id: id, type: type })
+        .execute();
 
       if (result.affected == 0)
         throw new NotFoundException(`Report with id ${id} not found`);
 
-      return { message: "Report deleted successfully" }
+      return { message: 'Report deleted successfully' };
     } catch (err) {
-      if (err instanceof NotFoundException) throw err
+      if (err instanceof NotFoundException) throw err;
 
       console.error('Delete failed:', err);
       throw new InternalServerErrorException('Could not delete report');
     }
   }
 
-  async removeReport(
-    type: ReportType,
-    id: string
-  ): Promise<ResponseJson> {
+  async removeReport(type: ReportType, id: string): Promise<ResponseJson> {
     try {
-      const result =
-        await this.reportsRepository
-          .createQueryBuilder()
-          .delete()
-          .from(ReportEntity)
-          .where('id = :id AND type = :type', { id: id, type: type })
-          .execute()
+      const result = await this.reportsRepository
+        .createQueryBuilder()
+        .delete()
+        .from(ReportEntity)
+        .where('id = :id AND type = :type', { id: id, type: type })
+        .execute();
 
       if (result.affected == 0)
         throw new NotFoundException(`Report with id ${id} not found`);
 
-      return { message: "Report deleted successfully" }
+      return { message: 'Report deleted successfully' };
     } catch (err) {
-      if (err instanceof NotFoundException) throw err
+      if (err instanceof NotFoundException) throw err;
 
       console.error('Delete failed:', err);
       throw new InternalServerErrorException('Could not delete report');

@@ -1,50 +1,59 @@
-import { Body, Controller, Delete, Get, Param, ParseEnumPipe, ParseUUIDPipe, Post, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseEnumPipe,
+  ParseUUIDPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ReportService } from './report.service';
-import { ReportType } from "./report.entity";
-import { ReportDataDto } from "./dto/report.dto";
+import { ReportType } from './report.entity';
+import { ReportDataDto } from './dto/report.dto';
 
 const reportTypePipe = new ParseEnumPipe(ReportType);
 
 @Controller('report/:type')
 export class ReportController {
-  constructor(private readonly reportService: ReportService) { }
+  constructor(private readonly reportService: ReportService) {}
 
   @Get()
   getAllReports(@Param('type', reportTypePipe) type: ReportType) {
-    return this.reportService.getAllReports(type)
+    return this.reportService.getAllReports(type);
   }
 
   @Get(':id')
   getReportById(
     @Param('type', reportTypePipe) type: ReportType,
-    @Param('id', ParseUUIDPipe) id: string
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
-    return this.reportService.getReportById(type, id)
+    return this.reportService.getReportById(type, id);
   }
 
   @Post()
   createReport(
     @Param('type', reportTypePipe) type: ReportType,
-    @Body() body: ReportDataDto
+    @Body() body: ReportDataDto,
   ) {
-    return this.reportService.createReport(type, body)
+    return this.reportService.createReport(type, body);
   }
 
   @Put(':id')
   editReport(
     @Param('type', reportTypePipe) type: ReportType,
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() body: ReportDataDto
+    @Body() body: ReportDataDto,
   ) {
-    return this.reportService.editReport(type, id, body)
+    return this.reportService.editReport(type, id, body);
   }
 
   @Delete(':id')
   removeReport(
     @Param('type', reportTypePipe) type: ReportType,
-    @Param('id', ParseUUIDPipe) id: string
+    @Param('id', ParseUUIDPipe) id: string,
   ) {
-    return this.reportService.removeReport(type, id)
+    return this.reportService.removeReport(type, id);
   }
-
 }

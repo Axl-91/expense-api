@@ -2,21 +2,21 @@ import {
   IsEmail,
   IsNotEmpty,
   IsString,
-  IsStrongPassword
-} from "class-validator";
+  IsStrongPassword,
+} from 'class-validator';
 
 export class UserDataDto {
   @IsString()
   @IsNotEmpty()
-  username: string
+  username: string;
 
   @IsString()
   @IsEmail()
   @IsNotEmpty()
-  email: string
+  email: string;
 
   @IsString()
   @IsStrongPassword()
   @IsNotEmpty()
-  password: string
-};
+  password: string;
+}

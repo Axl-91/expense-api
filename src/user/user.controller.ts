@@ -4,7 +4,7 @@ import { UserDataDto } from './dto/user.dto';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   @Get()
   getUsers() {
@@ -12,9 +12,7 @@ export class UserController {
   }
 
   @Post()
-  createUser(
-    @Body() userData: UserDataDto
-  ) {
-    return this.userService.createUser(userData)
+  createUser(@Body() userData: UserDataDto) {
+    return this.userService.createUser(userData);
   }
 }

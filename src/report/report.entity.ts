@@ -1,17 +1,23 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 export enum ReportType {
   INCOME = 'income',
-  EXPENSE = 'expense'
+  EXPENSE = 'expense',
 }
 
 @Entity({ name: 'reports' })
 export class ReportEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string
+  id: string;
 
   @Column()
-  source: string
+  source: string;
 
   @Column()
   amount: number;
@@ -19,13 +25,13 @@ export class ReportEntity {
   @Column({
     type: 'enum',
     enum: ReportType,
-    default: ReportType.EXPENSE
+    default: ReportType.EXPENSE,
   })
-  type: ReportType
+  type: ReportType;
 
   @CreateDateColumn()
-  created_at: Date
+  created_at: Date;
 
   @UpdateDateColumn()
-  updated_at: Date
+  updated_at: Date;
 }

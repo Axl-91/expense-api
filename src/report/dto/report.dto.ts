@@ -1,6 +1,6 @@
-import { Exclude, Expose } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsPositive, IsString } from "class-validator";
-import { ReportType } from "src/report/report.entity";
+import { Exclude, Expose } from 'class-transformer';
+import { IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
+import { ReportType } from 'src/report/report.entity';
 
 export class ReportDataDto {
   @IsString()
@@ -9,8 +9,8 @@ export class ReportDataDto {
   @IsNumber()
   @IsPositive()
   @IsNotEmpty()
-  amount: number
-};
+  amount: number;
+}
 
 export class ReportResponseDto {
   id: string;
@@ -26,6 +26,6 @@ export class ReportResponseDto {
   type: ReportType;
 
   constructor(partial: Partial<ReportDataDto>) {
-    Object.assign(this, partial)
+    Object.assign(this, partial);
   }
-};
+}
