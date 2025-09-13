@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseEnumPipe, ParseUUIDPipe, Post, Put } from "@nestjs/common";
 import { ReportService } from './report.service';
-import { ReportDataDto } from "src/dtos/report.dto";
 import { ReportType } from "./report.entity";
+import { ReportDataDto } from "./dto/report.dto";
 
 const reportTypePipe = new ParseEnumPipe(ReportType);
 

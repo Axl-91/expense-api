@@ -1,8 +1,8 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { ReportDataDto, ReportResponseDto } from 'src/dtos/report.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ReportEntity, ReportType } from './report.entity';
+import { ReportDataDto, ReportResponseDto } from './dto/report.dto';
 
 type ResponseJson = { "message": string }
 
