@@ -12,6 +12,30 @@ The data will be stored in an postgreSQL database
 $ npm install
 ```
 
+## DB setup and migrations
+
+Create `.env` file with the following parameters
+```
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+```
+
+Generate the db via docker compose
+```bash
+# Start DB
+docker compose up -d
+
+# Stop db
+docker compose down
+```
+
+Run the migrations for the db
+```
+# Run migrations
+npm run migration:run
+```
+
 ## Compile and run the project
 
 ```bash
