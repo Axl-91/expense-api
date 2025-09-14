@@ -2,12 +2,14 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { UserDataDto } from './dto/user.dto';
+import { UserDataDto, UserLoginDto, UserResponseDto } from './dto/user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { QueryFailedError, Repository } from 'typeorm';
 import { sign } from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
 
 type UserDb = { id: string; username: string; email: string; password: string };
 
@@ -22,7 +24,7 @@ export class UserService {
     return await this.usersRepository.find();
   }
 
-  addJsonWebToken(user: UserDb) {
+  generateJsonWebToken(user: UserDb) {
     return sign(
       {
         id: user.id,
@@ -35,16 +37,10 @@ export class UserService {
 
   async createUser(userData: UserDataDto) {
     try {
-      const result = await this.usersRepository
-        .createQueryBuilder()
-        .insert()
-        .into('users')
-        .values({ ...userData })
-        .execute();
+      const user = this.usersRepository.create(userData);
+      const resultUser = await this.usersRepository.save(user);
 
-      const id = (result.identifiers[0] as { id: string }).id;
-      const user: UserDb = { id, ...userData };
-      const userToken = this.addJsonWebToken(user);
+      const userToken = this.generateJsonWebToken(resultUser);
 
       return { message: 'User created successfully', token: userToken };
     } catch (err) {
@@ -57,5 +53,21 @@ export class UserService {
       console.error('Create failed:', err);
       throw new InternalServerErrorException('Could not create user');
     }
+  }
+
+  async loginUser(userData: UserLoginDto) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        email: userData.email,
+      },
+    });
+
+    const userPassword = user ? user.password : '';
+    const isValid = await bcrypt.compare(userData.password, userPassword);
+
+    if (!user || !isValid)
+      throw new UnauthorizedException(`Email or password incorrect`);
+
+    return new UserResponseDto(user);
   }
 }
