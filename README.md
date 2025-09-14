@@ -19,6 +19,8 @@ Create `.env` file with the following parameters
 DB_NAME=
 DB_USER=
 DB_PASSWORD=
+DB_PORT=
+JWT_SECRET=
 ```
 
 Generate the db via docker compose
