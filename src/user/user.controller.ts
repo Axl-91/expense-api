@@ -1,14 +1,15 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDataDto, UserLoginDto } from './dto/user.dto';
+import type { AuthRequest } from 'src/types/expressRequest.interface';
 
-@Controller('users')
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  getUsers() {
-    return this.userService.getUsers();
+  getUser(@Req() req: AuthRequest) {
+    return this.userService.showUser(req.user);
   }
 
   @Get('login')

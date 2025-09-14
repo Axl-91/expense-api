@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserDataDto, UserLoginDto, UserResponseDto } from './dto/user.dto';
@@ -20,8 +21,18 @@ export class UserService {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  async getUsers() {
-    return await this.usersRepository.find();
+  async getUserById(id: string) {
+    const user = await this.usersRepository.findOne({ where: { id: id } });
+
+    if (!user) throw new NotFoundException("User doesn't exists");
+
+    return user;
+  }
+
+  showUser(user: UserEntity | undefined) {
+    if (!user) throw new UnauthorizedException('JWT Invalid');
+
+    return new UserResponseDto(user);
   }
 
   generateJsonWebToken(user: UserDb) {
