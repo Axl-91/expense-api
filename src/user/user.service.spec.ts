@@ -8,18 +8,17 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers:
-        [
-          UserService,
-          {
-            provide: getRepositoryToken(UserEntity),
-            useValue: {
-              find: jest.fn(),
-              save: jest.fn(),
-              findOne: jest.fn()
-            }
-          }
-        ],
+      providers: [
+        UserService,
+        {
+          provide: getRepositoryToken(UserEntity),
+          useValue: {
+            find: jest.fn(),
+            save: jest.fn(),
+            findOne: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<UserService>(UserService);

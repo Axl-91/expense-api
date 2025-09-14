@@ -8,18 +8,17 @@ describe('ReportService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers:
-        [
-          ReportService,
-          {
-            provide: getRepositoryToken(ReportEntity),
-            useValue: {
-              find: jest.fn(),
-              save: jest.fn(),
-              findOne: jest.fn()
-            }
-          }
-        ],
+      providers: [
+        ReportService,
+        {
+          provide: getRepositoryToken(ReportEntity),
+          useValue: {
+            find: jest.fn(),
+            save: jest.fn(),
+            findOne: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     service = module.get<ReportService>(ReportService);

@@ -6,9 +6,15 @@ import { ReportModule } from './report/report.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import ormconfig from './ormconfig';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(ormconfig), ReportModule, UserModule],
+  imports: [
+    TypeOrmModule.forRoot(ormconfig),
+    ConfigModule.forRoot({ isGlobal: true }),
+    ReportModule,
+    UserModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
