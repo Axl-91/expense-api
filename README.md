@@ -33,7 +33,7 @@ docker compose down
 ```
 
 Run the migrations for the db
-```
+```bash
 # Run migrations
 npm run migration:run
 ```
