@@ -29,9 +29,7 @@ export class UserService {
     return user;
   }
 
-  showUser(user: UserEntity | undefined) {
-    if (!user) throw new UnauthorizedException('JWT Invalid');
-
+  showUser(user: UserEntity) {
     return new UserResponseDto(user);
   }
 
