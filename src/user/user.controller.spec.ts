@@ -26,7 +26,6 @@ describe('UserController', () => {
 
   const serializeResponse = (data: UserResponseDto) => {
     return instanceToPlain(data, {
-      strategy: 'excludeAll',
       exposeUnsetFields: false,
     });
   };
