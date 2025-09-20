@@ -4,6 +4,7 @@ import { UserService } from './user.service';
 import { UserDataDto, UserLoginDto, UserResponseDto } from './dto/user.dto';
 import { UserEntity } from './user.entity';
 import { instanceToPlain } from 'class-transformer';
+import { Response } from 'express';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -17,11 +18,27 @@ describe('UserController', () => {
     created_at: date,
     updated_at: date,
   };
+
   const mockUserResponse = {
     id: 'uuid',
     username: 'user',
     email: 'email@mail.com',
     createdAt: date,
+  };
+
+  const mockedJWT = {
+    name: 'jwt',
+    token: 'token',
+    options: { httpOnly: true, sameSite: 'strict' },
+  };
+
+  const createMockResponse = (): Response => {
+    const res = {} as Partial<Response>;
+    res.cookie = jest.fn().mockReturnValue(res);
+    res.clearCookie = jest.fn().mockReturnValue(res);
+    res.json = jest.fn().mockReturnValue(res);
+    res.status = jest.fn().mockReturnValue(res);
+    return res as Response;
   };
 
   const serializeResponse = (data: UserResponseDto) => {
@@ -34,11 +51,11 @@ describe('UserController', () => {
       return new UserResponseDto(user);
     }),
     loginUser: jest.fn((userLogin: UserLoginDto) => {
-      return new UserResponseDto(userLogin);
+      return { user: new UserResponseDto(userLogin), token: mockedJWT.token };
     }),
     createUser: jest.fn((userData: UserDataDto) => {
       void userData;
-      return { message: 'User created successfully', token: 'Token' };
+      return { user: new UserResponseDto(userData), token: mockedJWT.token };
     }),
   };
 
@@ -63,21 +80,38 @@ describe('UserController', () => {
   });
 
   it('Should login user', async () => {
-    const response = await controller.loginUser(mockUserData as UserEntity);
+    const mockedRes = createMockResponse();
+    const response = await controller.loginUser(
+      mockUserData as UserEntity,
+      mockedRes,
+    );
     const serializedResponse = serializeResponse(response);
 
     expect(serializedResponse).toEqual(mockUserResponse);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(mockedRes.cookie).toHaveBeenCalledWith(
+      mockedJWT.name,
+      mockedJWT.token,
+      mockedJWT.options,
+    );
     expect(mockUserService.loginUser).toHaveBeenCalled();
   });
 
   it('Should create user', async () => {
-    const expectedResponse = {
-      message: 'User created successfully',
-      token: 'Token',
-    };
-    const response = await controller.createUser(mockUserData as UserEntity);
+    const mockedRes = createMockResponse();
+    const response = await controller.createUser(
+      mockUserData as UserEntity,
+      mockedRes,
+    );
+    const serializedResponse = serializeResponse(response);
 
-    expect(response).toEqual(expectedResponse);
+    expect(serializedResponse).toEqual(mockUserResponse);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(mockedRes.cookie).toHaveBeenCalledWith(
+      mockedJWT.name,
+      mockedJWT.token,
+      mockedJWT.options,
+    );
     expect(mockUserService.createUser).toHaveBeenCalled();
   });
 });

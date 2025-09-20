@@ -15,9 +15,9 @@ export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly userService: UserService) {}
 
   async use(req: AuthRequest, _res: Response, next: NextFunction) {
-    const token = req.headers.authorization?.split(' ')[1];
+    const [scheme, token] = req.headers.authorization?.split(' ') ?? [];
 
-    if (!token) {
+    if (scheme !== 'Bearer' || !token) {
       req.user = undefined;
       next();
     } else {

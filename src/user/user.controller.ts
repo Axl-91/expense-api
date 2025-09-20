@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDataDto, UserLoginDto } from './dto/user.dto';
 import { User } from './decorators/user.decorator';
 import { UserEntity } from './user.entity';
 import { AuthGuard } from './guards/auth.guard';
+import type { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -15,13 +16,37 @@ export class UserController {
     return this.userService.showUser(user);
   }
 
-  @Get('login')
-  loginUser(@Body() userData: UserLoginDto) {
-    return this.userService.loginUser(userData);
+  @Post('register')
+  async createUser(
+    @Body() userData: UserDataDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { user, token } = await this.userService.createUser(userData);
+
+    res.cookie('jwt', token, { httpOnly: true, sameSite: 'strict' });
+
+    return user;
   }
 
-  @Post()
-  createUser(@Body() userData: UserDataDto) {
-    return this.userService.createUser(userData);
+  @Post('login')
+  async loginUser(
+    @Body() userData: UserLoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { user, token } = await this.userService.loginUser(userData);
+
+    res.cookie('jwt', token, { httpOnly: true, sameSite: 'strict' });
+
+    return user;
+  }
+
+  @Post('logout')
+  @UseGuards(AuthGuard)
+  logoutUser(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'strict' });
+
+    return {
+      message: 'logged out successfully',
+    };
   }
 }

@@ -51,7 +51,10 @@ export class UserService {
 
       const userToken = this.generateJsonWebToken(resultUser);
 
-      return { message: 'User created successfully', token: userToken };
+      return {
+        user: new UserResponseDto(user),
+        token: userToken,
+      };
     } catch (err) {
       if (err instanceof QueryFailedError) {
         const code = (err as { code?: string }).code;
@@ -77,6 +80,11 @@ export class UserService {
     if (!user || !isValid)
       throw new UnauthorizedException(`Email or password incorrect`);
 
-    return new UserResponseDto(user);
+    const userToken = this.generateJsonWebToken(user);
+
+    return {
+      user: new UserResponseDto(user),
+      token: userToken,
+    };
   }
 }
