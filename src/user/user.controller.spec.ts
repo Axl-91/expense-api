@@ -29,7 +29,13 @@ describe('UserController', () => {
   const mockedJWT = {
     name: 'jwt',
     token: 'token',
-    options: { httpOnly: true, sameSite: 'strict' },
+    options: {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 86400000,
+      path: '/',
+      secure: false,
+    },
   };
 
   const createMockResponse = (): Response => {
