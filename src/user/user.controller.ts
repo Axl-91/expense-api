@@ -23,7 +23,13 @@ export class UserController {
   ) {
     const { user, token } = await this.userService.createUser(userData);
 
-    res.cookie('jwt', token, { httpOnly: true, sameSite: 'strict' });
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+      path: '/',
+    });
 
     return user;
   }
@@ -35,7 +41,13 @@ export class UserController {
   ) {
     const { user, token } = await this.userService.loginUser(userData);
 
-    res.cookie('jwt', token, { httpOnly: true, sameSite: 'strict' });
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000,
+      path: '/',
+    });
 
     return user;
   }
@@ -43,7 +55,7 @@ export class UserController {
   @Post('logout')
   @UseGuards(AuthGuard)
   logoutUser(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'strict' });
+    res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
 
     return {
       message: 'logged out successfully',
