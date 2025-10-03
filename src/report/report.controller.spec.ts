@@ -3,6 +3,7 @@ import { ReportController } from './report.controller';
 import { ReportService } from './report.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ReportEntity } from './report.entity';
+import { UserEntity } from '../user/user.entity';
 
 describe('ReportController', () => {
   let controller: ReportController;
@@ -17,6 +18,12 @@ describe('ReportController', () => {
           useValue: {
             find: jest.fn(),
             save: jest.fn(),
+            findOne: jest.fn(),
+          },
+        },
+        {
+          provide: getRepositoryToken(UserEntity),
+          useValue: {
             findOne: jest.fn(),
           },
         },

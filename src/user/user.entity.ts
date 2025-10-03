@@ -4,10 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { ReportEntity } from '../report/report.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -28,6 +30,9 @@ export class UserEntity {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToMany(() => ReportEntity, (report) => report.user)
+  reports: ReportEntity[];
 
   @BeforeInsert()
   @BeforeUpdate()

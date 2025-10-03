@@ -32,12 +32,21 @@ export class ReportController {
     return this.reportService.getReportById(type, id);
   }
 
-  @Post()
+  @Get('/user/:id')
+  getReportsByUser(
+    @Param('type', reportTypePipe) type: ReportType,
+    @Param('id', ParseUUIDPipe) userId: string,
+  ) {
+    return this.reportService.getReportsByUser(type, userId);
+  }
+
+  @Post('/user/:id')
   createReport(
     @Param('type', reportTypePipe) type: ReportType,
+    @Param('id', ParseUUIDPipe) userId: string,
     @Body() body: ReportDataDto,
   ) {
-    return this.reportService.createReport(type, body);
+    return this.reportService.createReport(type, body, userId);
   }
 
   @Put(':id')

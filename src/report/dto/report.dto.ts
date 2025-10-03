@@ -1,6 +1,7 @@
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
-import { ReportType } from 'src/report/report.entity';
+import { ReportEntity, ReportType } from '../../report/report.entity';
+import { UserEntity } from '../../user/user.entity';
 
 export class ReportDataDto {
   @IsString()
@@ -24,6 +25,14 @@ export class ReportResponseDto {
   updated_at: Date;
 
   type: ReportType;
+
+  @Transform(({ obj }: { obj: ReportEntity }) => obj.user?.id, {
+    toPlainOnly: true,
+  })
+  user_id: string;
+
+  @Exclude()
+  user: UserEntity;
 
   constructor(partial: Partial<ReportDataDto>) {
     Object.assign(this, partial);

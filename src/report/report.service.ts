@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ReportEntity, ReportType } from './report.entity';
 import { ReportDataDto, ReportResponseDto } from './dto/report.dto';
+import { UserEntity } from '../user/user.entity';
 
 type ResponseJson = { message: string };
 
@@ -15,11 +16,15 @@ export class ReportService {
   constructor(
     @InjectRepository(ReportEntity)
     private readonly reportsRepository: Repository<ReportEntity>,
+
+    @InjectRepository(UserEntity)
+    private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
   async getAllReports(type: ReportType): Promise<ReportResponseDto[]> {
     const reports = await this.reportsRepository.find({
       where: { type: type },
+      relations: ['user'],
     });
     return reports.map((report) => new ReportResponseDto(report));
   }
@@ -40,11 +45,32 @@ export class ReportService {
     return new ReportResponseDto(report);
   }
 
+  async getReportsByUser(
+    type: ReportType,
+    userId: string,
+  ): Promise<ReportResponseDto[]> {
+    const reports = await this.reportsRepository.find({
+      where: {
+        user: { id: userId },
+        type: type,
+      },
+    });
+
+    return reports.map((report) => new ReportResponseDto(report));
+  }
+
   async createReport(
     type: ReportType,
     reportData: ReportDataDto,
+    userId: string,
   ): Promise<ResponseJson> {
     try {
+      const user = await this.usersRepository.findOne({
+        where: { id: userId },
+      });
+
+      if (!user) throw new NotFoundException('User not found');
+
       await this.reportsRepository
         .createQueryBuilder()
         .insert()
@@ -52,11 +78,14 @@ export class ReportService {
         .values({
           ...reportData,
           type: type,
+          user,
         })
         .execute();
 
       return { message: 'Report created successfully' };
     } catch (err) {
+      if (err instanceof NotFoundException) throw err;
+
       console.error('Insert failed:', err);
       throw new InternalServerErrorException('Could not insert report');
     }
