@@ -45,14 +45,10 @@ export class ReportService {
     return new ReportResponseDto(report);
   }
 
-  async getReportsByUser(
-    type: ReportType,
-    userId: string,
-  ): Promise<ReportResponseDto[]> {
+  async getReportsByUser(userId: string): Promise<ReportResponseDto[]> {
     const reports = await this.reportsRepository.find({
       where: {
         user: { id: userId },
-        type: type,
       },
     });
 

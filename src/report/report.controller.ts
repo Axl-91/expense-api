@@ -15,16 +15,21 @@ import { ReportDataDto } from './dto/report.dto';
 
 const reportTypePipe = new ParseEnumPipe(ReportType);
 
-@Controller('report/:type')
+@Controller('report')
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
-  @Get()
+  @Get('user/:id')
+  getReportsByUser(@Param('id', ParseUUIDPipe) userId: string) {
+    return this.reportService.getReportsByUser(userId);
+  }
+
+  @Get(':type')
   getAllReports(@Param('type', reportTypePipe) type: ReportType) {
     return this.reportService.getAllReports(type);
   }
 
-  @Get(':id')
+  @Get(':type/:id')
   getReportById(
     @Param('type', reportTypePipe) type: ReportType,
     @Param('id', ParseUUIDPipe) id: string,
@@ -32,15 +37,7 @@ export class ReportController {
     return this.reportService.getReportById(type, id);
   }
 
-  @Get('/user/:id')
-  getReportsByUser(
-    @Param('type', reportTypePipe) type: ReportType,
-    @Param('id', ParseUUIDPipe) userId: string,
-  ) {
-    return this.reportService.getReportsByUser(type, userId);
-  }
-
-  @Post('/user/:id')
+  @Post(':type/user/:id')
   createReport(
     @Param('type', reportTypePipe) type: ReportType,
     @Param('id', ParseUUIDPipe) userId: string,
@@ -49,7 +46,7 @@ export class ReportController {
     return this.reportService.createReport(type, body, userId);
   }
 
-  @Put(':id')
+  @Put(':type/:id')
   editReport(
     @Param('type', reportTypePipe) type: ReportType,
     @Param('id', ParseUUIDPipe) id: string,
@@ -58,7 +55,7 @@ export class ReportController {
     return this.reportService.editReport(type, id, body);
   }
 
-  @Delete(':id')
+  @Delete(':type/:id')
   removeReport(
     @Param('type', reportTypePipe) type: ReportType,
     @Param('id', ParseUUIDPipe) id: string,
